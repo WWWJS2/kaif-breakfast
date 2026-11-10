@@ -34,7 +34,19 @@ $('[data-login]').addEventListener('submit', async (e) => {
   e.preventDefault();
   const f = new FormData(e.target), err = $('[data-login-err]'), btn = e.target.querySelector('button');
   err.hidden = true; btn.disabled = true;
-  const { error } = await sb.auth.signInWithPassword({ email: String(f.get('email')).trim().toLowerCase(), password: String(f.get('password')) });
+  let error;
+  try {
+    const login = await sb.functions.invoke('admin-login', {
+      body: { username: String(f.get('username')).trim(), password: String(f.get('password')) },
+    });
+    error = login.error;
+    if (!error && login.data?.access_token && login.data?.refresh_token) {
+      const session = await sb.auth.setSession(login.data);
+      error = session.error;
+    } else if (!error) {
+      error = new Error('invalid_credentials');
+    }
+  } catch (e) { error = e; }
   btn.disabled = false;
   if (error) { err.textContent = 'بيانات الدخول غير صحيحة'; err.hidden = false; return; }
   if (!(await admin.isAdmin().catch(() => false))) { await sb.auth.signOut(); err.textContent = ERR.not_admin; err.hidden = false; return; }
