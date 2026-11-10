@@ -1,0 +1,51 @@
+/* ---------- fonts (self-hosted) ---------- */
+@font-face{font-family:"El Messiri";font-weight:500;font-display:swap;src:url(../fonts/el-messiri-arabic-500-normal.woff2) format("woff2");unicode-range:U+0600-06FF,U+0750-077F,U+0870-08FF,U+FB50-FDFF,U+FE70-FEFF,U+200C-200E}
+@font-face{font-family:"El Messiri";font-weight:600;font-display:swap;src:url(../fonts/el-messiri-arabic-600-normal.woff2) format("woff2");unicode-range:U+0600-06FF,U+0750-077F,U+0870-08FF,U+FB50-FDFF,U+FE70-FEFF,U+200C-200E}
+@font-face{font-family:"El Messiri";font-weight:700;font-display:swap;src:url(../fonts/el-messiri-arabic-700-normal.woff2) format("woff2");unicode-range:U+0600-06FF,U+0750-077F,U+0870-08FF,U+FB50-FDFF,U+FE70-FEFF,U+200C-200E}
+@font-face{font-family:"El Messiri";font-weight:500;font-display:swap;src:url(../fonts/el-messiri-latin-500-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+2000-206F,U+2212}
+@font-face{font-family:"El Messiri";font-weight:600;font-display:swap;src:url(../fonts/el-messiri-latin-600-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+2000-206F,U+2212}
+@font-face{font-family:"El Messiri";font-weight:700;font-display:swap;src:url(../fonts/el-messiri-latin-700-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+2000-206F,U+2212}
+@font-face{font-family:"Readex";font-weight:300;font-display:swap;src:url(../fonts/readex-pro-arabic-300-normal.woff2) format("woff2");unicode-range:U+0600-06FF,U+0750-077F,U+0870-08FF,U+FB50-FDFF,U+FE70-FEFF,U+200C-200E}
+@font-face{font-family:"Readex";font-weight:400;font-display:swap;src:url(../fonts/readex-pro-arabic-400-normal.woff2) format("woff2");unicode-range:U+0600-06FF,U+0750-077F,U+0870-08FF,U+FB50-FDFF,U+FE70-FEFF,U+200C-200E}
+@font-face{font-family:"Readex";font-weight:500;font-display:swap;src:url(../fonts/readex-pro-arabic-500-normal.woff2) format("woff2");unicode-range:U+0600-06FF,U+0750-077F,U+0870-08FF,U+FB50-FDFF,U+FE70-FEFF,U+200C-200E}
+@font-face{font-family:"Readex";font-weight:300;font-display:swap;src:url(../fonts/readex-pro-latin-300-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+2000-206F,U+2212}
+@font-face{font-family:"Readex";font-weight:400;font-display:swap;src:url(../fonts/readex-pro-latin-400-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+2000-206F,U+2212}
+@font-face{font-family:"Readex";font-weight:500;font-display:swap;src:url(../fonts/readex-pro-latin-500-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+2000-206F,U+2212}
+
+/* ---------- tokens: sunlit, from the logo and the morning photos ---------- */
+:root{
+  --kaif:#C85F16;          /* logo orange — the brand's voice */
+  --kaif-deep:#9C4610;
+  --kaif-soft:#F6E3D3;     /* orange washed in morning light */
+  --kaif-tint:#FBF1E8;
+  --palm:#155F0E;          /* logo green — tiny accents only */
+  --ink:#231A14;           /* trunk brown, used for text */
+  --ink-2:#5B4A3D;
+  --muted:#9A8877;
+  --bg:#FFFCF8;            /* warm white page */
+  --sand:#F2EADF;
+  --line:rgba(35,26,20,.12);
+  --line-2:rgba(35,26,20,.22);
+  --white:#FFFFFF;
+
+  --f-display:"El Messiri","Readex",system-ui,sans-serif;
+  --f-text:"Readex",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;
+
+  --gutter:clamp(18px,4.5vw,64px);
+  --ease:cubic-bezier(.22,1,.36,1);
+  --ease-io:cubic-bezier(.65,0,.35,1);
+  color-scheme:light;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;overflow-x:clip}
+body{overflow-x:clip}
+body{margin:0;font-family:var(--f-text);background:var(--bg);color:var(--ink);
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+img{display:block;max-width:100%}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--kaif);outline-offset:4px;border-radius:8px}
+.sr-only{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.num{font-family:var(--f-text);font-feature-settings:"tnum" 1,"lnum" 1;direction:ltr;unicode-bidi:isolate}
+.tnum{font-feature-settings:"tnum" 1,"lnum" 1}

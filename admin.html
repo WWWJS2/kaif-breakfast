@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>كايف · لوحة التحكم</title>
+<link rel="icon" href="assets/img/kaif-logo.png">
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body>
+
+<!-- ============ LOGIN ============ -->
+<section class="login" data-view="login" hidden>
+  <figure class="login__art" aria-hidden="true"><img src="assets/img/water-sm.webp" alt=""></figure>
+  <form class="login__card" data-login>
+    <img class="login__logo" src="assets/img/kaif-logo.png" alt="كايف المزرعة">
+    <h1>لوحة التحكم</h1>
+    <label class="fld"><span>البريد الإلكتروني</span><input type="email" name="email" autocomplete="username" required dir="ltr"></label>
+    <label class="fld"><span>كلمة المرور</span><input type="password" name="password" autocomplete="current-password" required dir="ltr"></label>
+    <p class="login__err" data-login-err role="alert" hidden></p>
+    <button class="btn btn--primary" type="submit">دخول</button>
+  </form>
+</section>
+
+<!-- ============ DASHBOARD ============ -->
+<div class="app" data-view="app" hidden>
+  <header class="bar">
+    <div class="bar__brand"><img src="assets/img/kaif-logo.png" alt="كايف"><span>لوحة التحكم</span></div>
+    <div class="bar__end">
+      <span class="bar__sync" data-sync></span>
+      <a class="btn btn--ghost" href="./" target="_blank" rel="noopener">صفحة الدعوة</a>
+      <button class="btn btn--ghost" type="button" data-logout>خروج</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- overview -->
+    <section class="kpis" aria-label="الإحصائيات">
+      <div class="kpi"><span>الحجوزات</span><b class="num" data-k="bookings">0</b></div>
+      <div class="kpi"><span>إجمالي الحضور</span><b class="num" data-k="guests">0</b></div>
+      <div class="kpi"><span>المقاعد المتبقية</span><b class="num" data-k="remaining">0</b></div>
+      <div class="kpi kpi--switch">
+        <span>استقبال الحجوزات</span>
+        <label class="switch"><input type="checkbox" data-global-open><i></i><em data-global-open-label></em></label>
+      </div>
+    </section>
+
+    <!-- days -->
+    <section class="panel">
+      <header class="panel__head"><h2>الأيام والمقاعد</h2></header>
+      <div class="days" data-days></div>
+    </section>
+
+    <div class="cols">
+      <!-- slots -->
+      <section class="panel">
+        <header class="panel__head"><h2>أوقات الحضور</h2>
+          <button class="btn btn--ghost btn--sm" type="button" data-add-slot>+ إضافة وقت</button></header>
+        <ul class="slots" data-slots></ul>
+      </section>
+      <!-- capacity -->
+      <section class="panel">
+        <header class="panel__head"><h2>الحدود</h2></header>
+        <form class="limits" data-limits>
+          <label class="fld"><span>الحد الأقصى لكل يوم (الضيف والمرافقون)</span><input type="number" name="capacity" min="1" max="1000" required></label>
+          <label class="fld"><span>الحد الأقصى للأشخاص في الدعوة الواحدة</span><input type="number" name="max_party" min="1" max="9" required></label>
+          <button class="btn btn--primary" type="submit">حفظ</button>
+        </form>
+      </section>
+    </div>
+
+    <!-- bookings -->
+    <section class="panel">
+      <header class="panel__head">
+        <h2>الحجوزات</h2>
+        <div class="tools">
+          <input class="search" type="search" placeholder="بحث بالاسم" data-search>
+          <button class="btn btn--ghost btn--sm" type="button" data-export>تصدير CSV</button>
+        </div>
+      </header>
+      <div class="chips" data-filter-day></div>
+      <div class="chips chips--status" data-filter-status></div>
+      <div class="table" data-table></div>
+    </section>
+  </main>
+</div>
+
+<div class="toast" data-toast role="status" aria-live="polite" hidden></div>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/vendor/supabase.js" defer></script>
+<script type="module" src="assets/js/admin.js"></script>
+</body>
+</html>
