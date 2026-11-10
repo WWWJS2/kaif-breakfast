@@ -34,7 +34,7 @@ $('[data-login]').addEventListener('submit', async (e) => {
   e.preventDefault();
   const f = new FormData(e.target), err = $('[data-login-err]'), btn = e.target.querySelector('button');
   err.hidden = true; btn.disabled = true;
-  const { error } = await sb.auth.signInWithPassword({ email: `${String(f.get('username')).trim().toLowerCase()}@kaif-breakfast.invalid`, password: String(f.get('password')) });
+  const { error } = await sb.auth.signInWithPassword({ email: String(f.get('email')).trim().toLowerCase(), password: String(f.get('password')) });
   btn.disabled = false;
   if (error) { err.textContent = 'بيانات الدخول غير صحيحة'; err.hidden = false; return; }
   if (!(await admin.isAdmin().catch(() => false))) { await sb.auth.signOut(); err.textContent = ERR.not_admin; err.hidden = false; return; }
