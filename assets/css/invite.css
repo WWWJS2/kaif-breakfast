@@ -276,3 +276,51 @@ body{background:var(--bg)}
  .counter button{width:52px;height:52px}
 }
 @media(max-height:670px){.hero__seal{width:65px;top:18px}.hero__welcome{font-size:34px}.hero__meta{bottom:85px;gap:8px}.hero__sub{font-size:17px}.hero__body{font-size:12px}}
+
+.hero__meta{top:0;bottom:0;align-content:center;padding-block:0}
+@media(max-width:900px){
+ .hero__seal{width:72px;top:calc(22px + env(safe-area-inset-top,0px))}
+ .hero__meta{top:0;bottom:0;gap:11px;inset-inline:24px;align-content:center}
+ .hero__welcome{font-size:clamp(28px,8vw,34px);line-height:1.28}
+ .hero__sub{font-size:16px;line-height:1.55;margin:0}
+ .hero__body{font-size:12.5px;line-height:1.8;margin:0;max-width:36ch}
+ .book__sheet{padding-inline:20px;padding-bottom:46px;border-radius:24px 24px 0 0}
+ .sheet__grip{width:36px;height:4px;margin-bottom:24px}
+ .form{padding-inline-start:24px}
+ .form::before{inset-inline-start:5px;bottom:90px}
+ .step{padding-bottom:26px}
+ .step::before{width:11px;height:11px;top:7px;inset-inline-start:-24px}
+ .step.is-current::before{box-shadow:0 0 0 4px var(--kaif-tint)}
+ .step__label{font-size:17px;line-height:1.45;margin-bottom:10px}
+ .namefield input{height:46px;font-size:16px}
+ .dd__trigger{min-height:52px;padding:7px;padding-inline-start:14px;border-radius:13px;gap:8px}
+ .dd__value{font-size:17px;gap:3px 6px}
+ .dd__value small,.dd--cal .dd__value .num{font-size:11px}
+ .dd__chev{width:36px;height:36px;border-radius:10px}
+ .dd__chev svg,.dd--cal .dd__chev svg{width:15px}
+ .opt__pill{font-size:10px;padding:4px 8px}
+ .counter{height:58px;padding:6px;border-radius:13px;gap:8px}
+ .counter button{width:44px;height:44px;border-radius:10px;font-size:25px}
+ .counter input{width:60px;font-size:26px}
+ .cta{height:54px;font-size:17px;padding-inline-start:20px;padding-inline-end:7px}
+ .cta__arrow{width:40px;height:40px}
+ .cta__arrow svg{width:18px}
+ .notice{font-size:13px;padding:10px 12px}
+ .dd__opt{padding:12px 14px}
+ .opt__main{font-size:17px}
+ .dd--cal .dd__panel{padding:12px}
+ .cal__month{font-size:18px}
+ .cal__week span{font-size:10px}
+ .cal__week,.cal__grid{gap:4px}
+ .cal__day{font-size:14px;border-radius:10px}
+ .ticket__card{width:min(340px,calc(100vw - 36px));padding:10px 10px 18px;border-radius:22px}
+ .ticket__photo{height:120px;border-radius:16px}
+ .ticket__seal{width:68px;margin-top:-34px}
+ .ticket__rows{margin-inline:12px}
+ .ticket__rows div{padding-block:9px}
+ .ticket__rows dt{font-size:11px}
+ .ticket__rows dd{font-size:18px}
+ .reel{padding-block:30px}
+ .reel__track img{width:28vw;border-radius:10px}
+ .reel__seal{width:72px}
+}
