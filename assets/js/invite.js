@@ -1,6 +1,6 @@
 import { ORIGINAL as T, FUNCTIONAL as F } from './strings.js?v=20261111-2';
 import { getAvailability, createBooking, uuid, configured } from './api.js?v=20261111-2';
-import { createDropdown, createCalendar } from './dropdown.js?v=20261111-2';
+import { createDropdown } from './dropdown.js?v=20261111-2';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -19,13 +19,12 @@ const state = { av: null, day: null, slot: null, party: 1, busy: false, token: n
 const phoneInput = $('#phone');
 const digits = (v) => String(v).replace(/[٠-٩]/g, c => String(c.charCodeAt(0) - 1632)).replace(/[۰-۹]/g, c => String(c.charCodeAt(0) - 1776)).replace(/[\s()-]/g, '');
 const monthParts = new Intl.DateTimeFormat('en', { timeZone: 'Asia/Riyadh', year: 'numeric', month: '2-digit' }).formatToParts(new Date());
-let viewMonth = monthParts.find(p => p.type === 'year').value + '-' + monthParts.find(p => p.type === 'month').value + '-01';
+let viewMonth = '2026-11-01';
 const form = $('#booking'), nameInput = $('#guest'), cta = $('[data-cta]'), notice = $('[data-notice]');
 
-const dayDD = createCalendar($('[data-dd="day"]'), {
+const dayDD = createDropdown($('[data-dd="day"]'), {
   renderValue: (it) => `<small>${T.dayPrefix}</small><span>${esc(it.label)}</span><small class="num">${fmtDate(it.date)}</small><span class="opt__pill">${T.dayAvailable}</span>`,
   onChange: (v) => { state.day = v; clearInvalid(3); syncPeople(); hideNotice(); },
-  onMonthChange: (month) => { viewMonth = month; state.av = null; cta.disabled = true; refresh(); },
 });
 const timeDD = createDropdown($('[data-dd="time"]'), {
   renderValue: (it) => `<span class="tnum">${it.text}</span>`,
@@ -35,7 +34,7 @@ const timeDD = createDropdown($('[data-dd="time"]'), {
 function render(av) {
   state.av = av;
   // days
-  dayDD.setItems(av.days.map((d) => ({ value: d.id, label: d.label, date: d.event_date, disabled: !d.available || !av.open, full: d.is_open && d.remaining === 0 })));
+  dayDD.setItems(av.days.map((d) => ({ value: d.id, label: d.label, date: d.event_date, disabled: !d.available || !av.open, full: d.is_open && d.remaining === 0 })), (it) => `<span class="opt__lead"><span class="opt__main">${esc(it.label)}</span><span class="opt__date num">${fmtDate(it.date)}</span></span><span class="opt__pill">${it.full ? F.dayFull : it.disabled ? F.bookingClosed : T.dayAvailable}</span>`);
   // times
   timeDD.setItems(av.slots.map((s) => ({ value: s.id, text: slotText(s) })), (it) => `<span class="opt__main tnum">${it.text}</span>`);
   $('[data-time-label]').textContent = T.timeLabel();
