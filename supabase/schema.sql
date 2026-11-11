@@ -522,7 +522,7 @@ end $$;
 update public.time_slots set is_active=false;
 insert into public.time_slots(starts_at,ends_at,sort,is_active)
 select t,t+interval '30 minutes',row_number() over(order by t)::smallint,true
-from (values('06:00'::time),('06:30'::time),('07:00'::time),('07:30'::time),('08:00'::time),('08:30'::time)) v(t);
+from (values('06:00'::time),('06:30'::time),('07:00'::time),('07:30'::time),('08:00'::time),('08:30'::time),('09:00'::time)) v(t);
 
 notify pgrst,'reload schema';
 commit;
