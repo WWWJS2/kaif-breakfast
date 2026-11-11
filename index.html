@@ -6,9 +6,9 @@
 <title>كايف</title>
 <meta name="theme-color" content="#FFFCF8">
 <link rel="icon" href="assets/img/kaif-logo.png">
-<link rel="preload" as="image" href="assets/img/hero.webp" imagesrcset="assets/img/hero-sm.webp 900w, assets/img/hero.webp 2000w" imagesizes="100vw">
+<link rel="preload" as="image" href="assets/img/morning.webp" imagesrcset="assets/img/morning-sm.webp 900w, assets/img/morning.webp 2000w" imagesizes="100vw">
 <link rel="stylesheet" href="assets/css/base.css">
-<link rel="stylesheet" href="assets/css/invite.css">
+<link rel="stylesheet" href="assets/css/invite.css?v=20261111-2">
 </head>
 <body class="is-loading">
 
@@ -16,7 +16,7 @@
 <section class="hero" id="top" aria-label="كايف">
   <div class="hero__pin">
     <figure class="hero__photo" aria-hidden="true">
-      <img src="assets/img/hero.webp" srcset="assets/img/hero-sm.webp 900w, assets/img/hero.webp 2000w" sizes="100vw" alt="" fetchpriority="high">
+      <img src="assets/img/morning.webp" srcset="assets/img/morning-sm.webp 900w, assets/img/morning.webp 2000w" sizes="100vw" alt="" fetchpriority="high">
     </figure>
     <span class="hero__veil" aria-hidden="true"></span>
     <span class="hero__curtain hero__curtain--t" aria-hidden="true"></span>
@@ -28,7 +28,6 @@
       <h1 class="hero__welcome">صباحك بين النخيل في كايف المزرعة</h1>
       <p class="hero__sub">نتشرف بحضوركم لتجربة فطور كايف الخاصة</p>
       <p class="hero__body">تجربة استثنائية وسط أجواء المزرعة الهادئة والمذاق الرفيع.<br> يرجى تأكيد حجزكم لتوفير تجربة تليق بكم.</p>
-      <p class="hero__hours tnum" aria-hidden="true"><span data-hour-from>6:00</span><i></i><span data-hour-to>9:00</span></p>
     </div>
 
     <a class="hero__cue" href="#invite" aria-label="اختر اليوم المناسب">
@@ -45,7 +44,6 @@
     <img class="media"       data-key="table"   src="assets/img/table.webp"   alt="" loading="lazy">
     <img class="media"       data-key="shadows" src="assets/img/shadows.webp" alt="" loading="lazy">
     <img class="media"       data-key="lounge"  src="assets/img/lounge.webp"  alt="" loading="lazy">
-    <div class="media__seal"><img src="assets/img/kaif-logo.png" alt=""></div>
   </aside>
 
   <div class="book__sheet">
@@ -53,26 +51,34 @@
     <form class="form" id="booking" novalidate>
 
       <div class="step" data-step="1" data-img="lamp">
-        <label class="step__label" for="guest">اسم الشخص المدعو <b class="req" aria-hidden="true">*</b></label>
+        <label class="step__label" for="guest">الاسم <b class="req" aria-hidden="true">*</b></label>
         <div class="namefield">
-          <input id="guest" name="guest" type="text" placeholder="أدخل الاسم الكريم" autocomplete="name" required minlength="2" maxlength="80" enterkeyhint="next">
+          <input id="guest" name="guest" type="text" placeholder="الاسم" autocomplete="name" required minlength="2" maxlength="80" enterkeyhint="next">
         </div>
       </div>
 
-      <div class="step" data-step="2" data-img="table">
+      <div class="step" data-step="2" data-img="lamp">
+        <label class="step__label" for="phone">الرقم <b class="req" aria-hidden="true">*</b></label>
+        <div class="namefield"><input id="phone" name="phone" type="tel" placeholder="05xxxxxxxx" autocomplete="tel" inputmode="tel" required maxlength="20" dir="ltr" enterkeyhint="next"></div>
+      </div>
+
+      <div class="step" data-step="3" data-img="table">
         <span class="step__label" id="day-label">اختر اليوم المناسب <b class="req" aria-hidden="true">*</b></span>
         <div class="dd" data-dd="day" aria-labelledby="day-label"></div>
       </div>
 
-      <div class="step" data-step="3" data-img="shadows">
-        <span class="step__label" id="time-label"><span data-time-label>وقت الحضور المفضل (من 6:00 ص حتى 9:00 ص)</span> <b class="req" aria-hidden="true">*</b></span>
+      <div class="step" data-step="4" data-img="shadows">
+        <span class="step__label" id="time-label"><span data-time-label>الوقت</span> <b class="req" aria-hidden="true">*</b></span>
         <div class="dd" data-dd="time" aria-labelledby="time-label"></div>
       </div>
 
-      <div class="step" data-step="4" data-img="lounge">
-        <span class="step__label" id="people-label">إجمالي عدد الأشخاص (الضيف والمرافقين) <b class="req" aria-hidden="true">*</b></span>
-        <div class="dd" data-dd="people" aria-labelledby="people-label"></div>
-        <p class="people__note"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7"/><path d="M8 7v4M8 4.6v.1"/></svg><span data-people-note>يمكن اختيار من 1 إلى 9 أشخاص كحد أقصى لكل دعوة.</span></p>
+      <div class="step" data-step="5" data-img="lounge">
+        <span class="step__label" id="people-label">المرافقين <b class="req" aria-hidden="true">*</b></span>
+        <div class="counter" role="group" aria-labelledby="people-label">
+          <button type="button" data-count-minus aria-label="تقليل المرافقين">−</button>
+          <input type="number" id="companions" value="1" min="1" max="9" readonly role="spinbutton" aria-labelledby="people-label" aria-valuemin="1" aria-valuemax="9" aria-valuenow="1">
+          <button type="button" data-count-plus aria-label="زيادة المرافقين">+</button>
+        </div>
       </div>
 
       <div class="submit">
@@ -105,10 +111,11 @@
     <p class="ticket__title" data-ticket-title hidden></p>
     <svg class="ticket__check" viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24"/><path d="M15 27l7 7 15-16"/></svg>
     <dl class="ticket__rows">
-      <div><dt>اسم الشخص المدعو</dt><dd id="ticket-name" data-t="name"></dd></div>
+      <div><dt>الاسم</dt><dd id="ticket-name" data-t="name"></dd></div>
+      <div><dt>الرقم</dt><dd class="tnum" data-t="phone"></dd></div>
       <div><dt>اختر اليوم المناسب</dt><dd data-t="day"></dd></div>
       <div><dt data-t="timeLabel"></dt><dd class="tnum" data-t="time"></dd></div>
-      <div><dt>إجمالي عدد الأشخاص (الضيف والمرافقين)</dt><dd data-t="people"></dd></div>
+      <div><dt>المرافقين</dt><dd data-t="people"></dd></div>
     </dl>
   </div>
 </dialog>
@@ -117,6 +124,6 @@
 <script src="assets/vendor/supabase.js" defer></script>
 <script src="assets/vendor/gsap.min.js" defer></script>
 <script src="assets/vendor/ScrollTrigger.min.js" defer></script>
-<script type="module" src="assets/js/invite.js"></script>
+<script type="module" src="assets/js/invite.js?v=20261111-2"></script>
 </body>
 </html>

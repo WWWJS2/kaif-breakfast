@@ -251,3 +251,28 @@ body{background:var(--bg)}
   .reel__track{animation:none}
   .ticket[open] .ticket__check path{stroke-dashoffset:0}
 }
+
+.hero__seal{width:clamp(92px,8vw,122px);aspect-ratio:941/1432;border-radius:0;background:transparent;box-shadow:none;top:calc(28px + env(safe-area-inset-top,0px))}
+.hero__seal img{width:100%;height:100%;object-fit:contain;filter:brightness(0) invert(1);opacity:.96;filter:brightness(0) invert(1) drop-shadow(0 3px 12px rgba(0,0,0,.2))}
+.hero__photo img{object-position:50% 59%}
+.hero__veil{background:linear-gradient(180deg,rgba(19,31,23,.26),rgba(19,31,23,.12) 28%,rgba(15,26,19,.27) 50%,rgba(15,26,19,.72))}
+.hero__meta{bottom:calc(clamp(100px,13svh,125px) + env(safe-area-inset-bottom,0px))}
+.counter{height:80px;border:1px solid var(--line-2);border-radius:20px;display:flex;align-items:center;justify-content:space-between;padding:10px;background:white;direction:ltr;gap:12px}
+.counter button{width:56px;height:56px;flex:none;border:0;border-radius:14px;background:var(--kaif-tint);color:var(--kaif-deep);font-size:30px;cursor:pointer;transition:transform .2s,background .2s,opacity .2s;touch-action:manipulation}
+.counter button:active{transform:scale(.9)}
+.counter button:disabled{opacity:.28;cursor:default}
+.counter input{width:80px;min-width:0;padding:0;border:0;text-align:center;color:var(--ink);background:transparent;font-family:var(--f-display);font-size:34px;font-weight:600;appearance:textfield;-moz-appearance:textfield}
+.counter input::-webkit-inner-spin-button,.counter input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.cal__day small{display:block;font-size:8px;line-height:1;color:var(--kaif-deep)}
+@media(max-width:900px){
+ .hero__seal{width:86px;top:calc(24px + env(safe-area-inset-top,0px))}
+ .hero__welcome{font-size:clamp(34px,9.8vw,46px);line-height:1.24}
+ .hero__meta{bottom:calc(104px + env(safe-area-inset-bottom,0px));gap:14px}
+ .hero__sub{font-size:19px}
+ .hero__body{font-size:14px;line-height:1.9}
+ .hero__photo img{object-position:50% 60%;will-change:transform}
+ .step{padding-bottom:44px}
+ .counter{height:76px}
+ .counter button{width:52px;height:52px}
+}
+@media(max-height:670px){.hero__seal{width:65px;top:18px}.hero__welcome{font-size:34px}.hero__meta{bottom:85px;gap:8px}.hero__sub{font-size:17px}.hero__body{font-size:12px}}

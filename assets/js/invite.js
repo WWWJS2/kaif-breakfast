@@ -1,6 +1,6 @@
-import { ORIGINAL as T, FUNCTIONAL as F } from './strings.js';
-import { getAvailability, createBooking, uuid, configured } from './api.js';
-import { createDropdown, createCalendar } from './dropdown.js';
+import { ORIGINAL as T, FUNCTIONAL as F } from './strings.js?v=20261111-2';
+import { getAvailability, createBooking, uuid, configured } from './api.js?v=20261111-2';
+import { createDropdown, createCalendar } from './dropdown.js?v=20261111-2';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -11,36 +11,34 @@ const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&
 const meridiem = (h) => (h < 12 ? T.am : F.pm);
 const fmtSlot = (t) => { const [h, m] = t.split(':').map(Number); const hh = h % 12 || 12; return `${String(hh).padStart(2, '0')}:${String(m).padStart(2, '0')} ${meridiem(h)}`; };
 const fmtShort = (t) => { const [h, m] = t.split(':').map(Number); return `${h % 12 || 12}:${String(m).padStart(2, '0')}`; };
-const slotText = (s) => `${fmtSlot(s.starts_at)} - ${fmtSlot(s.ends_at)}`;
+const slotText = (s) => fmtSlot(s.starts_at);
 const fmtDate = (d) => (d ? `${d.slice(8, 10)}.${d.slice(5, 7)}` : '');
 
 // ---------- state ----------
-const state = { av: null, day: null, slot: null, party: null, busy: false, token: null };
+const state = { av: null, day: null, slot: null, party: 1, busy: false, token: null };
+const phoneInput = $('#phone');
+const digits = (v) => String(v).replace(/[٠-٩]/g, c => String(c.charCodeAt(0) - 1632)).replace(/[۰-۹]/g, c => String(c.charCodeAt(0) - 1776)).replace(/[\s()-]/g, '');
+const monthParts = new Intl.DateTimeFormat('en', { timeZone: 'Asia/Riyadh', year: 'numeric', month: '2-digit' }).formatToParts(new Date());
+let viewMonth = monthParts.find(p => p.type === 'year').value + '-' + monthParts.find(p => p.type === 'month').value + '-01';
 const form = $('#booking'), nameInput = $('#guest'), cta = $('[data-cta]'), notice = $('[data-notice]');
 
 const dayDD = createCalendar($('[data-dd="day"]'), {
   renderValue: (it) => `<small>${T.dayPrefix}</small><span>${esc(it.label)}</span><small class="num">${fmtDate(it.date)}</small><span class="opt__pill">${T.dayAvailable}</span>`,
-  onChange: (v) => { state.day = v; clearInvalid(2); syncPeople(); hideNotice(); },
+  onChange: (v) => { state.day = v; clearInvalid(3); syncPeople(); hideNotice(); },
+  onMonthChange: (month) => { viewMonth = month; state.av = null; cta.disabled = true; refresh(); },
 });
 const timeDD = createDropdown($('[data-dd="time"]'), {
   renderValue: (it) => `<span class="tnum">${it.text}</span>`,
-  onChange: (v) => { state.slot = v; clearInvalid(3); },
+  onChange: (v) => { state.slot = v; clearInvalid(4); },
 });
 
 function render(av) {
   state.av = av;
   // days
-  dayDD.setItems(av.days.map((d) => ({ value: d.id, label: d.label, date: d.event_date, disabled: !d.available || !av.open })));
+  dayDD.setItems(av.days.map((d) => ({ value: d.id, label: d.label, date: d.event_date, disabled: !d.available || !av.open, full: d.is_open && d.remaining === 0 })));
   // times
   timeDD.setItems(av.slots.map((s) => ({ value: s.id, text: slotText(s) })), (it) => `<span class="opt__main tnum">${it.text}</span>`);
-  // the time-window label + the hero's monumental hours
-  if (av.slots.length) {
-    const from = av.slots.map((s) => s.starts_at).sort()[0];
-    const to = av.slots.map((s) => s.ends_at).sort().at(-1);
-    $('[data-time-label]').textContent = T.timeLabel(fmtShort(from), fmtShort(to));
-    $('[data-hour-from]').textContent = fmtShort(from);
-    $('[data-hour-to]').textContent = fmtShort(to);
-  }
+  $('[data-time-label]').textContent = T.timeLabel();
 
   const anyOpen = av.open && av.days.some((d) => d.available);
   cta.disabled = !anyOpen;
@@ -49,19 +47,30 @@ function render(av) {
   syncPeople();
 }
 
-const peopleDD = createDropdown($('[data-dd="people"]'), {
-  renderValue: (it) => `<span>${it.text}</span>`,
-  onChange: (v) => { state.party = v; if (v) clearInvalid(4); },
-});
+const countInput = $('#companions');
 function syncPeople() {
   const av = state.av; if (!av) return;
-  const d = av.days.find((x) => x.id === state.day);
-  const limit = Math.min(av.max_party, d ? d.remaining : av.max_party);
-  peopleDD.setItems(Array.from({ length: av.max_party }, (_, i) => ({ value: i + 1, text: T.people(i + 1), disabled: i + 1 > limit })),
-    (it) => `<span class="opt__lead opt__lead--row"><span class="opt__main tnum">${it.value}</span><span class="opt__pre">${it.text}</span></span>`);
-  $('[data-people-note]').textContent = T.peopleNote(av.max_party);
+  const d = av.days.find(x => x.id === state.day);
+  const limit = Math.max(1, Math.min(9, av.max_party, d ? d.remaining : 9));
+  state.party = Math.max(1, Math.min(state.party || 1, limit));
+  countInput.value = state.party;
+  countInput.max = limit;
+  countInput.setAttribute('aria-valuemax', limit);
+  countInput.setAttribute('aria-valuenow', state.party);
+  $('[data-count-minus]').disabled = state.party <= 1;
+  $('[data-count-plus]').disabled = state.party >= limit;
 }
-function setParty(n) { state.party = n; peopleDD.value = n; }
+function setParty(n) { state.party = n || 1; syncPeople(); }
+$('[data-count-minus]').addEventListener('click', () => { setParty(state.party - 1); syncRail(); });
+$('[data-count-plus]').addEventListener('click', () => { setParty(state.party + 1); syncRail(); });
+countInput.addEventListener('keydown', e => {
+  if (['ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key)) {
+    e.preventDefault();
+    setParty(e.key === 'Home' ? 1 : e.key === 'End' ? Number(countInput.max) : state.party + (e.key === 'ArrowUp' ? 1 : -1));
+    syncRail();
+  }
+});
+phoneInput.addEventListener('input', () => { clearInvalid(2); phoneInput.setCustomValidity(''); });
 
 nameInput.addEventListener('input', () => { nameInput.closest('.namefield').classList.toggle('has-value', !!nameInput.value.trim()); clearInvalid(1); });
 
@@ -76,7 +85,8 @@ function markInvalid(n) {
 
 // ---------- availability (refreshes so a full day closes for everyone) ----------
 async function refresh() {
-  try { render(await getAvailability()); }
+  const month = viewMonth;
+  try { const av = await getAvailability(month); if (month === viewMonth) render(av); }
   catch (e) { if (!state.av) { cta.disabled = true; showNotice(F.networkError); } }
 }
 
@@ -85,33 +95,36 @@ form.addEventListener('submit', async (e) => {
   e.preventDefault();
   if (state.busy) return;
   const name = nameInput.value.trim();
+  const phone = digits(phoneInput.value);
   const missing = [];
   if (name.length < 2) missing.push(1);
-  if (!state.day) missing.push(2);
-  if (!state.slot) missing.push(3);
-  if (!state.party) missing.push(4);
+  if (!/^\+?[0-9]{8,15}$/.test(phone)) { missing.push(2); phoneInput.setCustomValidity('أدخل رقمًا صحيحًا'); }
+  if (!state.day) missing.push(3);
+  if (!state.slot) missing.push(4);
+  if (!state.party) missing.push(5);
   if (missing.length) {
     missing.forEach(markInvalid);
     $(`.step[data-step="${missing[0]}"]`).scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
     if (missing[0] === 1) setTimeout(() => nameInput.focus({ preventScroll: true }), 400);
+    if (missing[0] === 2) { phoneInput.focus(); phoneInput.reportValidity(); }
     return;
   }
   state.busy = true; cta.classList.add('is-busy'); cta.setAttribute('aria-busy', 'true'); hideNotice();
   state.token ||= uuid();
   try {
-    const r = await createBooking({ name, day: state.day, slot: state.slot, party: state.party, token: state.token });
+    const r = await createBooking({ name, phone, day: state.day, slot: state.slot, party: state.party, token: state.token });
     if (r?.ok) {
       const day = state.av.days.find((d) => d.id === state.day);
       const slot = state.av.slots.find((s) => s.id === state.slot);
-      const ticket = { name, day: `${T.dayPrefix} ${day.label}`, time: slotText(slot), people: T.people(state.party),
+      const ticket = { name, phone, day: `${T.dayPrefix} ${day.label} ${day.event_date}`, time: slotText(slot), people: T.people(state.party),
         timeLabel: $('[data-time-label]').textContent, id: r.booking?.id };
       try { localStorage.setItem('kaif-ticket', JSON.stringify(ticket)); } catch {}
       state.token = null;
       openTicket(ticket);
       form.reset(); nameInput.closest('.namefield').classList.remove('has-value');
-      dayDD.value = null; timeDD.value = null; state.day = state.slot = null; setParty(null);
+      dayDD.value = null; timeDD.value = null; state.day = state.slot = null; setParty(1); syncRail();
     } else {
-      const msg = { day_full: F.dayFullError, day_closed: F.dayFullError, not_enough_seats: F.notEnoughSeats, closed: F.bookingClosed }[r?.error] || F.networkError;
+      const msg = { day_full: F.dayFullError, day_closed: F.dayFullError, not_enough_seats: F.notEnoughSeats, closed: F.bookingClosed, invalid_phone: 'أدخل رقمًا صحيحًا' }[r?.error] || F.networkError;
       showNotice(msg);
       if (r?.error !== 'invalid_name') state.token = null;
     }
@@ -136,7 +149,7 @@ dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
 
 // ---------- progress rail: which choices are made ----------
 function syncRail() {
-  const done = { 1: nameInput.value.trim().length >= 2, 2: !!state.day, 3: !!state.slot, 4: !!state.party };
+  const done = { 1: nameInput.value.trim().length >= 2, 2: /^\+?[0-9]{8,15}$/.test(digits(phoneInput.value)), 3: !!state.day, 4: !!state.slot, 5: !!state.party };
   $$('.step').forEach((s) => s.classList.toggle('is-done', !!done[s.dataset.step]));
 }
 ['input', 'change', 'keyup'].forEach((ev) => form.addEventListener(ev, syncRail));
@@ -184,7 +197,13 @@ function motion() {
       .to(['.hero__seal', '.hero__meta', '.hero__cue', '.hero__veil'], { opacity: 0, ease: 'none', duration: 0.35 }, 0);
   } else {
     // phone: the photo drifts while the white sheet rises over it
-    gsap.to('.hero__photo img', { yPercent: 12, scale: 1.12, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
+    gsap.timeline({ scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 0.7 } })
+      .to('.hero__photo img', { yPercent: 15, scale: 1.16, ease: 'none' }, 0)
+      .to('.hero__meta', { y: -50, opacity: 0, ease: 'none', duration: 0.8 }, 0)
+      .to('.hero__seal', { y: -20, opacity: 0, ease: 'none', duration: 0.7 }, 0)
+      .to('.hero__photo', { clipPath: 'inset(0% 4% 0% 4% round 26px)', ease: 'none' }, 0);
+    gsap.fromTo('.book__sheet', { y: 42 }, { y: 0, ease: 'none', scrollTrigger: { trigger: '.book', start: 'top bottom', end: 'top 35%', scrub: 0.6 } });
+    gsap.utils.toArray('.reel__row').forEach((row, i) => gsap.from(row, { xPercent: i ? -12 : 12, opacity: 0.35, ease: 'none', scrollTrigger: { trigger: row, start: 'top bottom', end: 'top 45%', scrub: 0.8 } }));
   }
 
   // each step settles into place
@@ -199,6 +218,6 @@ function boot() {
   refresh();
   setInterval(() => { if (!document.hidden) refresh(); }, 10000);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
-  try { const t = JSON.parse(localStorage.getItem('kaif-ticket') || 'null'); if (t) openTicket(t); } catch {}
+
 }
 boot();

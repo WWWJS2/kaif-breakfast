@@ -19,12 +19,13 @@ async function call(fn, args) {
   return data;
 }
 
-export const getAvailability = () => call('get_availability');
-export const createBooking = ({ name, day, slot, party, token }) =>
-  call('create_booking', { p_name: name, p_day: day, p_slot: slot, p_party: party, p_token: token });
+export const getAvailability = (month) => call('get_calendar_availability', { p_month: month });
+export const createBooking = ({ name, phone, day, slot, party, token }) =>
+  call('create_booking_with_phone', { p_name: name, p_phone: phone, p_day: day, p_slot: slot, p_party: party, p_token: token });
 
 export const admin = {
   dashboard: () => call('admin_dashboard'),
+  calendar: (month) => call('admin_calendar', { p_month: month }),
   isAdmin: () => call('is_admin'),
   updateSettings: (o) => call('admin_update_settings', o),
   updateDay: (o) => call('admin_update_day', o),

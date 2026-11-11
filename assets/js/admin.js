@@ -1,4 +1,4 @@
-import { sb, admin, configured, preview } from './api.js';
+import { sb, admin, configured, preview } from './api.js?v=20261111-2';
 import { ORIGINAL as T, FUNCTIONAL as F } from './strings.js';
 
 const $ = (s, r = document) => r.querySelector(s);
@@ -10,6 +10,10 @@ const fmt = (t) => { const [h, m] = t.split(':').map(Number); return `${String(h
 const fmtDate = (d) => (d ? `${d.slice(8, 10)}.${d.slice(5, 7)}` : '');
 const when = (iso) => new Date(iso).toLocaleString('ar-SA-u-nu-latn', { weekday: 'short', hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' });
 
+const monthParts = new Intl.DateTimeFormat('en', { timeZone: 'Asia/Riyadh', year: 'numeric', month: '2-digit' }).formatToParts(new Date());
+let calendarMonth = monthParts.find(p => p.type === 'year').value + '-' + monthParts.find(p => p.type === 'month').value;
+$('[data-calendar-month]').value = calendarMonth;
+$('[data-calendar-month]').addEventListener('change', e => { if (e.target.value) { calendarMonth = e.target.value; load(); } });
 let data = null, filterDay = 'all', filterStatus = 'active', q = '', timer = null;
 
 function toast(msg, err = false) {
@@ -59,7 +63,7 @@ async function enter() { show('app'); await load(); clearInterval(timer); timer 
 
 // ---------- load + render ----------
 async function load() {
-  try { data = await admin.dashboard(); render(); $('[data-sync]').textContent = 'آخر تحديث ' + new Date().toLocaleTimeString('ar-SA-u-nu-latn', { hour: '2-digit', minute: '2-digit' }); }
+  try { const month = calendarMonth; const [dashboard, calendar] = await Promise.all([admin.dashboard(), admin.calendar(month + '-01')]); if (month !== calendarMonth) return; data = dashboard; data.dayNames = Object.fromEntries(dashboard.days.map(d => [d.id, d.label])); data.days = calendar.days; render(); $('[data-sync]').textContent = 'آخر تحديث ' + new Date().toLocaleTimeString('ar-SA-u-nu-latn', { hour: '2-digit', minute: '2-digit' }); }
   catch (e) { if (/not_admin/.test(e.message)) logout(); else toast(e.message, true); }
 }
 
@@ -106,7 +110,7 @@ function render() {
 }
 
 function rowsFiltered() {
-  const dayName = Object.fromEntries(data.days.map((d) => [d.id, d.label]));
+  const dayName = { ...data.dayNames, ...Object.fromEntries(data.days.map((d) => [d.id, d.label + ' ' + d.event_date])) };
   return data.bookings.filter((b) =>
     (filterDay === 'all' || b.day_id === filterDay) &&
     (filterStatus === 'all' || (filterStatus === 'active' ? b.status !== 'cancelled' : b.status === filterStatus)) &&
@@ -116,7 +120,7 @@ function renderTable() {
   const rows = rowsFiltered();
   $('[data-table]').innerHTML = `<div class="row row--head"><span>الاسم</span><span>اليوم</span><span>الوقت</span><span>العدد</span><span>الحالة</span><span>ملاحظة</span><span>وقت الحجز</span></div>` +
     (rows.map((b) => `<div class="row ${b.status === 'cancelled' ? 'is-cancelled' : ''}" data-b="${b.id}">
-      <b>${esc(b.guest_name)}</b>
+      <b>${esc(b.guest_name)}${b.guest_phone ? `<small class="booking-phone" dir="ltr">${esc(b.guest_phone)}</small>` : ''}</b>
       <span class="r-day">${esc(b.day)}</span>
       <span class="r-time tnum">${fmt(b.starts_at)} - ${fmt(b.ends_at)}</span>
       <span class="r-party num">${b.party_size}</span>
@@ -170,8 +174,8 @@ $('[data-table]').addEventListener('change', (e) => {
 });
 $('[data-export]').addEventListener('click', () => {
   const rows = rowsFiltered();
-  const head = ['الاسم', 'اليوم', 'من', 'إلى', 'العدد', 'الحالة', 'ملاحظة', 'وقت الحجز'];
-  const csv = [head, ...rows.map((b) => [b.guest_name, b.day, b.starts_at, b.ends_at, b.party_size, STATUS[b.status], b.admin_note || '', b.created_at])]
+  const head = ['الاسم', 'الرقم', 'اليوم', 'من', 'إلى', 'العدد', 'الحالة', 'ملاحظة', 'وقت الحجز'];
+  const csv = [head, ...rows.map((b) => [b.guest_name, b.guest_phone || '', b.day, b.starts_at, b.ends_at, b.party_size, STATUS[b.status], b.admin_note || '', b.created_at])]
     .map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
   const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv' })), download: 'kaif-bookings.csv' });
   a.click(); URL.revokeObjectURL(a.href);

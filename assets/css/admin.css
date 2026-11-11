@@ -146,3 +146,5 @@ h1,h2{font-family:var(--f-text);font-weight:600;margin:0}
   .search{min-width:0;width:140px}
 }
 .r-meta{display:none}
+
+.calendar-month{display:flex;align-items:center;gap:10px;font-size:14px}.calendar-month input{font:inherit;color:var(--ink);padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:white}.booking-phone{display:block;font-family:var(--f-body);font-size:13px;font-weight:400;margin-top:6px;color:var(--muted);text-align:right}

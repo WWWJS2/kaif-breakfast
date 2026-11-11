@@ -90,7 +90,7 @@ const LOC = 'ar-SA-u-ca-gregory-nu-latn';
 const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 const arrow = (d) => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${d}"/></svg>`;
 
-export function createCalendar(root, { renderValue, onChange }) {
+export function createCalendar(root, { renderValue, onChange, onMonthChange }) {
   const id = 'cal-' + Math.random().toString(36).slice(2, 8);
   const labelledby = root.getAttribute('aria-labelledby');
   root.classList.add('dd', 'dd--cal');
@@ -135,14 +135,18 @@ export function createCalendar(root, { renderValue, onChange }) {
       const key = iso(new Date(y, m, d)), it = map[key];
       const on = it && !it.disabled;
       const cls = ['cal__day', it ? 'is-event' : '', it && it.disabled ? 'is-full' : '', key === sel ? 'is-selected' : ''].join(' ');
+      const reason = it?.full ? '، مكتمل' : it && it.disabled ? '، مغلق' : '';
       html += `<button type="button" role="gridcell" class="${cls}" data-date="${key}"${on ? '' : ' aria-disabled="true" tabindex="-1"'}
-        aria-selected="${key === sel}" aria-label="${new Intl.DateTimeFormat(LOC, { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date(y, m, d))}"><span>${d}</span></button>`;
+        aria-selected="${key === sel}" aria-label="${new Intl.DateTimeFormat(LOC, { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date(y, m, d))}${reason}"><span>${d}</span>${it?.full ? '<small>مكتمل</small>' : ''}</button>`;
     }
     grid.innerHTML = html;
     const months = [...new Set(items.map((x) => x.date.slice(0, 7)))].sort();
     const cur = `${y}-${String(m + 1).padStart(2, '0')}`;
-    root.querySelector('[data-nav="-1"]').disabled = !months.some((x) => x < cur);
-    root.querySelector('[data-nav="1"]').disabled = !months.some((x) => x > cur);
+    const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Riyadh', year: 'numeric', month: '2-digit' }).format(new Date());
+    const parts = new Intl.DateTimeFormat('en', { timeZone: 'Asia/Riyadh', year: 'numeric', month: '2-digit' }).formatToParts(new Date());
+    const minMonth = parts.find(p => p.type === 'year').value + '-' + parts.find(p => p.type === 'month').value;
+    root.querySelector('[data-nav="-1"]').disabled = onMonthChange ? cur <= minMonth : !months.some((x) => x < cur);
+    root.querySelector('[data-nav="1"]').disabled = onMonthChange ? false : !months.some((x) => x > cur);
   }
   const enabled = () => [...grid.querySelectorAll('.cal__day:not([aria-disabled])')];
   function open() {
@@ -170,7 +174,9 @@ export function createCalendar(root, { renderValue, onChange }) {
   trigger.addEventListener('click', () => (root.classList.contains('is-open') ? close() : open()));
   root.querySelector('.dd__scrim').addEventListener('click', () => close(true));
   root.querySelectorAll('.cal__nav').forEach((b) => b.addEventListener('click', () => {
-    view = new Date(view.getFullYear(), view.getMonth() + Number(b.dataset.nav), 1); draw();
+    view = new Date(view.getFullYear(), view.getMonth() + Number(b.dataset.nav), 1);
+    if (onMonthChange) { items = []; value = null; onChange?.(null); onMonthChange(iso(view)); }
+    draw();
   }));
   grid.addEventListener('click', (e) => { const b = e.target.closest('.cal__day'); if (b) chooseDate(b.dataset.date); });
   grid.addEventListener('keydown', (e) => {
@@ -186,7 +192,7 @@ export function createCalendar(root, { renderValue, onChange }) {
     setItems(next) {
       items = next.filter((x) => x.date);
       if (!view && items.length) {
-        const firstOpen = items.find((x) => !x.disabled) || items[0];
+        const firstOpen = items[0];
         const d = new Date(firstOpen.date + 'T00:00:00'); view = new Date(d.getFullYear(), d.getMonth(), 1);
       }
       if (value !== null && !items.some((x) => x.value === value && !x.disabled)) { value = null; onChange?.(null); }
